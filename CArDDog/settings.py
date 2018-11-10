@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-from .secret import SOCIAL_AUTH_TWITTER_KEY, SOCIAL_AUTH_TWITTER_SECRET
+from .secret import SOCIAL_KEYS
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -136,8 +136,12 @@ STATIC_URL = '/api/static/'
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.twitter.TwitterOAuth',
+    'social_core.backends.github.GithubOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
-SOCIAL_AUTH_TWITTER_KEY = SOCIAL_AUTH_TWITTER_KEY
-SOCIAL_AUTH_TWITTER_SECRET = SOCIAL_AUTH_TWITTER_SECRET
+SOCIAL_AUTH_TWITTER_KEY = SOCIAL_KEYS["TWITTER_KEY"]
+SOCIAL_AUTH_TWITTER_SECRET = SOCIAL_KEYS["TWITTER_SECRET"]
+SOCIAL_AUTH_GITHUB_KEY = SOCIAL_KEYS["GITHUB_KEY"]
+SOCIAL_AUTH_GITHUB_SECRET = SOCIAL_KEYS["GITHUB_SECRET"]
+
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
