@@ -1,0 +1,3 @@
+[submodule "CArDCat"]
+	path = CArDCat
+	url = https://github.com/Amausahouse/CArDCat

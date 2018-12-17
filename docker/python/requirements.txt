@@ -3,4 +3,11 @@ psycopg2-binary
 djangorestframework
 django-filter
 social-auth-app-django
+numpy
+opencv-python
+matplotlib
+keras
+tensorflow
+dlib
+imutils
 

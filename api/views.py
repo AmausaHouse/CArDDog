@@ -6,7 +6,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 import os
 import uuid
-
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../CArDCat'))
+import imagepredict
+from keras import backend as K
 # Create your views here
 
 class loginview(APIView):
@@ -43,4 +46,7 @@ class findface(APIView):
         destination = open(path, 'wb')
         for chunk in file.chunks():
             destination.write(chunk)
-        return Response('sucess')
+        K.clear_session()
+        p = imagepredict.ImagePredictor()
+        # print(p.predict(path))
+        return Response(p.predict(path))
