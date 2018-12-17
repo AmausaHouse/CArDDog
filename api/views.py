@@ -14,7 +14,7 @@ class loginview(APIView):
         password = request.data['password']
         user = authenticate(username=username, password=password)
         if user is not None:
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return Response('success')
         else:
             return Response('faild')
@@ -29,5 +29,5 @@ class signupview(APIView):
             return Response(username + 'は取得されています')
         else:
             user = User.objects.create_user(username, password=password)
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return Response('success')
