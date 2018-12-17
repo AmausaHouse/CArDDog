@@ -4,6 +4,9 @@ from django.http import HttpResponse
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
+import os
+import uuid
+
 # Create your views here
 
 class loginview(APIView):
@@ -31,3 +34,13 @@ class signupview(APIView):
             user = User.objects.create_user(username, password=password)
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return Response('success')
+class findface(APIView):
+    def post(self, requeset):
+        UPLOADE_DIR = '/src/files/faceimages'
+        file = requeset.FILES['file']
+        filename = str(uuid.uuid4()) + '.jpg'
+        path = UPLOADE_DIR + '/' + filename
+        destination = open(path, 'wb')
+        for chunk in file.chunks():
+            destination.write(chunk)
+        return Response('sucess')
