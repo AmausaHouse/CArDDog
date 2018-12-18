@@ -39,6 +39,7 @@ class signupview(APIView):
             return Response('success')
 class findface(APIView):
     def post(self, requeset):
+        """
         UPLOADE_DIR = '/src/files/faceimages'
         file = requeset.FILES['file']
         filename = str(uuid.uuid4()) + '.jpg'
@@ -50,3 +51,8 @@ class findface(APIView):
         p = imagepredict.ImagePredictor()
         # print(p.predict(path))
         return Response(p.predict(path))
+        """
+        a, base64encdjpg = requeset.data['file'].split(';base64,') 
+        K.clear_session()
+        p = imagepredict.ImagePredictor()
+        return Response(p.predict_from_base64img(base64encdjpg))
