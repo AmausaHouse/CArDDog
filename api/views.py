@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from .models import Profile
 from social_django.models import UserSocialAuth
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__),"../CArDCat"))
+from imagepredict import ImagePredictor
 
 import os
 import uuid
@@ -40,25 +43,18 @@ class signupview(APIView):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return Response('success')
 class findface(APIView):
-    def post(self, requeset):
-        """
-        UPLOADE_DIR = '/src/files/faceimages'
-        file = requeset.FILES['file']
-        filename = str(uuid.uuid4()) + '.jpg'
-        path = UPLOADE_DIR + '/' + filename
-        destination = open(path, 'wb')
-        for chunk in file.chunks():
-            destination.write(chunk)
+    def post(self, request):
         K.clear_session()
-        p = imagepredict.ImagePredictor()
-        # print(p.predict(path))
-        return Response(p.predict(path))
-        a, base64encdjpg = requeset.data['file'].split(';base64,') 
-        K.clear_session()
-        p = imagepredict.ImagePredictor()
-        return Response(p.predict_from_base64img(base64encdjpg))
-        """
-        return Response('工事中')
+        p = ImagePredictor()
+        b64img = list(request.data['base64img'].split(','))[1]
+        data = p.predict(b64img)
+        print(data)
+        outdata = []
+        for d in data:
+            rectlis = [d["rect"].top(), d["rect"].right(), d["rect"].bottom(), d["rect"].left()]
+            outdata.append({"index": d["index"], "rect": rectlis})
+        print(outdata)
+        return Response(outdata)
 class profile(APIView):
     def post(self, request):
         req_type = request.query_params["req_type"]
