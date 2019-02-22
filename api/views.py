@@ -15,6 +15,7 @@ import uuid
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../CArDCat'))
 from keras import backend as K
+import logging
 # Create your views here
 
 class loginview(APIView):
@@ -42,18 +43,19 @@ class signupview(APIView):
             user = User.objects.create_user(username, password=password)
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return Response('success')
+predictor = ImagePredictor()
+logger = logging.getLogger('development')
 class findface(APIView):
     def post(self, request):
-        K.clear_session()
-        p = ImagePredictor()
         b64img = list(request.data['base64img'].split(','))[1]
-        data = p.predict(b64img)
+        data = predictor.predict(b64img)
         print(data)
         outdata = []
         for d in data:
             rectlis = [d["rect"].top(), d["rect"].right(), d["rect"].bottom(), d["rect"].left()]
             outdata.append({"index": d["index"], "rect": rectlis})
         print(outdata)
+        logger.info(outdata)
         return Response(outdata)
 class profile(APIView):
     def post(self, request):
