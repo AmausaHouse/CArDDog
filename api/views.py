@@ -7,14 +7,11 @@ from django.contrib.auth import login, logout, authenticate
 from .models import Profile
 from social_django.models import UserSocialAuth
 import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__),"../CArDCat"))
+sys.path.append("/src/CArDCat")
 from imagepredict import ImagePredictor
 
-import os
 import uuid
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '../CArDCat'))
-from keras import backend as K
+#from keras import backend as K
 import logging
 # Create your views here
 
@@ -49,12 +46,13 @@ class findface(APIView):
     def post(self, request):
         b64img = list(request.data['base64img'].split(','))[1]
         data = predictor.predict(b64img)
-        print(data)
+        logger.info(data)
         outdata = []
         for d in data:
             rectlis = [d["rect"].top(), d["rect"].right(), d["rect"].bottom(), d["rect"].left()]
-            outdata.append({"index": d["index"], "rect": rectlis})
-        print(outdata)
+            r = {"index": d["index"],"rect": rectlis}
+            r.update(_get_info_from_index(d["index"]))
+            outdata.append(r)
         logger.info(outdata)
         return Response(outdata)
 class profile(APIView):
@@ -97,3 +95,10 @@ def _get_icon_from_user(user):
     elif provider == "twitter":
         pass
     return ''
+def _get_info_from_index(index):
+    profile = Profile.objects.get(user_nn_index=index)
+    return {
+        "display_name": profile.display_name,
+        "user_icon": profile.user_icon_url,
+        "user_dictionaly": profile.user_dictionaly
+        }
