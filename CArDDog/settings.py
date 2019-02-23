@@ -25,9 +25,16 @@ SECRET_KEY = 'n*d84tb9)!a47-i-6wd%*2ya^n@kq$vuzne=0qa4mv#qs$5z@+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
+import logging
+
+# For debugging
+logging.basicConfig(
+    level = logging.DEBUG,
+    format = '%(asctime)s %(levelname)s %(message)s',
+)
 # Application definition
 
 INSTALLED_APPS = [

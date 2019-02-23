@@ -6,12 +6,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from .models import Profile
 from social_django.models import UserSocialAuth
+import sys, os
+sys.path.append("/src/CArDCat")
+from imagepredict import ImagePredictor
 
-import os
 import uuid
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '../CArDCat'))
-from keras import backend as K
+#from keras import backend as K
+import logging
 # Create your views here
 
 class loginview(APIView):
@@ -39,26 +40,21 @@ class signupview(APIView):
             user = User.objects.create_user(username, password=password)
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return Response('success')
+predictor = ImagePredictor()
+logger = logging.getLogger('development')
 class findface(APIView):
-    def post(self, requeset):
-        """
-        UPLOADE_DIR = '/src/files/faceimages'
-        file = requeset.FILES['file']
-        filename = str(uuid.uuid4()) + '.jpg'
-        path = UPLOADE_DIR + '/' + filename
-        destination = open(path, 'wb')
-        for chunk in file.chunks():
-            destination.write(chunk)
-        K.clear_session()
-        p = imagepredict.ImagePredictor()
-        # print(p.predict(path))
-        return Response(p.predict(path))
-        a, base64encdjpg = requeset.data['file'].split(';base64,') 
-        K.clear_session()
-        p = imagepredict.ImagePredictor()
-        return Response(p.predict_from_base64img(base64encdjpg))
-        """
-        return Response('工事中')
+    def post(self, request):
+        b64img = list(request.data['base64img'].split(','))[1]
+        data = predictor.predict(b64img)
+        logger.info(data)
+        outdata = []
+        for d in data:
+            rectlis = [d["rect"].top(), d["rect"].right(), d["rect"].bottom(), d["rect"].left()]
+            r = {"index": d["index"],"rect": rectlis}
+            r.update(_get_info_from_index(d["index"]))
+            outdata.append(r)
+        logger.info(outdata)
+        return Response(outdata)
 class profile(APIView):
     def post(self, request):
         req_type = request.query_params["req_type"]
@@ -99,3 +95,10 @@ def _get_icon_from_user(user):
     elif provider == "twitter":
         pass
     return ''
+def _get_info_from_index(index):
+    profile = Profile.objects.get(user_nn_index=index)
+    return {
+        "display_name": profile.display_name,
+        "user_icon": profile.user_icon_url,
+        "user_dictionaly": profile.user_dictionaly
+        }
